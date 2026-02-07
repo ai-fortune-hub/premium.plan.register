@@ -1,0 +1,152 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>プレミアムプランお申し込み</title>
+  <script src="https://static.line-scdn.net/liff/edge/2/sdk.js"></script>
+  <style>
+    :root { --primary: #6c5ce7; --bg: #f4f7f9; }
+    body { font-family: sans-serif; background-color: var(--bg); padding: 15px; color: #333; }
+    h2 { text-align: center; color: var(--primary); font-size: 1.2rem; }
+    .section-title { font-weight: bold; margin: 20px 0 10px; border-left: 4px solid var(--primary); padding-left: 10px; font-size: 0.95rem;}
+    .card { background: white; border-radius: 15px; padding: 20px; box-shadow: 0 4px 10px rgba(0,0,0,0.05); margin-bottom: 20px; }
+    
+    label { display: block; font-size: 0.8rem; margin-bottom: 5px; color: #666; font-weight: bold; }
+    .must { color: red; margin-left: 4px; }
+    .flex { display: flex; gap: 10px; }
+    .flex > div { flex: 1; }
+    
+    input, select, textarea { 
+      width: 100%; padding: 12px; margin-bottom: 15px; border: 1px solid #ddd; border-radius: 8px; box-sizing: border-box; font-size: 1rem;
+    }
+    
+    .btn-submit { 
+      width: 100%; padding: 16px; background: #06C755; color: white; border: none; border-radius: 30px; font-size: 1.1rem; font-weight: bold; cursor: pointer;
+    }
+    .btn-submit:active { opacity: 0.8; }
+  </style>
+</head>
+<body>
+
+<h2>プレミアムプラン詳細設定 🌙</h2>
+
+<div class="card">
+  <div class="section-title">安否確認の設定</div>
+  <label>送付希望時間<span class="must">*</span></label>
+  <input type="time" id="send_time" required value="08:00">
+
+  <div class="section-title">ご本人様情報</div>
+  <label>お名前（漢字）<span class="must">*</span></label>
+  <div class="flex">
+    <input type="text" id="user_last_name" placeholder="苗字" required>
+    <input type="text" id="user_first_name" placeholder="名前" required>
+  </div>
+  
+  <label>フリガナ（カタカナ）<span class="must">*</span></label>
+  <div class="flex">
+    <input type="text" id="user_last_kana" placeholder="ミョウジ" required pattern="[ァ-ヴー]*">
+    <input type="text" id="user_first_kana" placeholder="ナマエ" required pattern="[ァ-ヴー]*">
+  </div>
+
+  <label>ご住所<span class="must">*</span></label>
+  <textarea id="user_address" rows="2" placeholder="東京都港区..." required></textarea>
+  
+  <label>電話番号<span class="must">*</span></label>
+  <input type="tel" id="user_tel" placeholder="09012345678" required>
+  
+  <label>メールアドレス<span class="must">*</span></label>
+  <input type="email" id="user_email" placeholder="example@mail.com" required>
+
+  <div class="section-title">緊急連絡先</div>
+  <label>続柄（ご本人から見て）<span class="must">*</span></label>
+  <select id="emergency_rel" required>
+    <option value="">選択してください</option>
+    <option value="夫・妻">夫・妻</option>
+    <option value="長男・次男以降">息子（長男・次男以降）</option>
+    <option value="長女・次女以降">娘（長女・次女以降）</option>
+    <option value="父・母">父・母</option>
+    <option value="兄弟・姉妹">兄弟・姉妹</option>
+    <option value="親戚">親戚</option>
+    <option value="友人・知人">友人・知人</option>
+    <option value="その他">その他</option>
+  </select>
+
+  <label>お名前（フルネーム）<span class="must">*</span></label>
+  <input type="text" id="emergency_name" placeholder="山田 一郎" required>
+  
+  <label>LINE ID<span class="must">*</span></label>
+  <input type="text" id="emergency_line" placeholder="必須項目です" required>
+  
+  <label>電話番号<span class="must">*</span></label>
+  <input type="tel" id="emergency_tel" placeholder="08012345678" required>
+  
+  <label>メールアドレス<span class="must">*</span></label>
+  <input type="email" id="emergency_email" placeholder="family@mail.com" required>
+
+  <label>ご住所（任意）</label>
+  <textarea id="emergency_address" rows="2" placeholder="任意項目です"></textarea>
+</div>
+
+<button class="btn-submit" onclick="submitForm()">保存して決済へ進む</button>
+
+<script>
+// --- 設定項目 ---
+const LIFF_ID = "あなたのLIFF_ID";
+const MAKE_WEBHOOK_URL = "あなたのMake用WebhookURL";
+const STRIPE_URL = "あなたのStripeリンク";
+
+async function initLIFF() {
+  await liff.init({ liffId: LIFF_ID });
+  if (!liff.isLoggedIn()) { liff.login(); }
+}
+
+async function submitForm() {
+  const profile = await liff.getProfile();
+  
+  // データ取得
+  const formData = {
+    userId: profile.userId,
+    sendTime: document.getElementById('send_time').value,
+    userLastName: document.getElementById('user_last_name').value,
+    userFirstName: document.getElementById('user_first_name').value,
+    userLastKana: document.getElementById('user_last_kana').value,
+    userFirstKana: document.getElementById('user_first_kana').value,
+    userAddress: document.getElementById('user_address').value,
+    userTel: document.getElementById('user_tel').value,
+    userEmail: document.getElementById('user_email').value,
+    emergencyRel: document.getElementById('emergency_rel').value,
+    emergencyName: document.getElementById('emergency_name').value,
+    emergencyLine: document.getElementById('emergency_line').value,
+    emergencyTel: document.getElementById('emergency_tel').value,
+    emergencyEmail: document.getElementById('emergency_email').value,
+    emergencyAddress: document.getElementById('emergency_address').value,
+  };
+
+  // 必須チェック
+  if(!formData.userLastName || !formData.emergencyLine || !formData.emergencyEmail) {
+    alert("必須項目(*)をすべて入力してください");
+    return;
+  }
+
+  try {
+    // 1. Make.comにデータを送信
+    await fetch(MAKE_WEBHOOK_URL, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(formData)
+    });
+
+    // 2. Stripe決済へ
+    window.location.href = `${STRIPE_URL}?client_reference_id=${profile.userId}`;
+    
+  } catch (e) {
+    alert("エラーが発生しました。");
+  }
+}
+
+initLIFF();
+</script>
+
+</body>
+</html>
