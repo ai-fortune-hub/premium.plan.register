@@ -6,25 +6,73 @@
   <title>プレミアムプランお申し込み</title>
   <script src="https://static.line-scdn.net/liff/edge/2/sdk.js"></script>
   <style>
-    :root { --primary: #6c5ce7; --bg: #f4f7f9; }
-    body { font-family: sans-serif; background-color: var(--bg); padding: 15px; color: #333; }
-    h2 { text-align: center; color: var(--primary); font-size: 1.2rem; }
-    .section-title { font-weight: bold; margin: 20px 0 10px; border-left: 4px solid var(--primary); padding-left: 10px; font-size: 0.95rem;}
-    .card { background: white; border-radius: 15px; padding: 20px; box-shadow: 0 4px 10px rgba(0,0,0,0.05); margin-bottom: 20px; }
+    :root {
+      --primary: #6c5ce7;
+      --line-color: #06C755;
+      --bg: #f4f7f9;
+      --text: #2d3436;
+    }
+    body { 
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+      background-color: var(--bg);
+      padding: 15px;
+      color: var(--text);
+      line-height: 1.5;
+    }
+    h2 { text-align: center; color: var(--primary); font-size: 1.3rem; margin-bottom: 20px; }
+    .section-title { 
+      font-weight: bold; 
+      margin: 25px 0 10px; 
+      border-left: 5px solid var(--primary); 
+      padding-left: 10px; 
+      font-size: 1rem;
+    }
+    .card { 
+      background: white; 
+      border-radius: 18px; 
+      padding: 20px; 
+      box-shadow: 0 4px 15px rgba(0,0,0,0.08); 
+      margin-bottom: 25px; 
+    }
     
-    label { display: block; font-size: 0.8rem; margin-bottom: 5px; color: #666; font-weight: bold; }
-    .must { color: red; margin-left: 4px; }
+    label { display: block; font-size: 0.85rem; margin-bottom: 6px; color: #555; font-weight: 600; }
+    .must { color: #e74c3c; margin-left: 4px; font-size: 0.8rem; }
+    
     .flex { display: flex; gap: 10px; }
     .flex > div { flex: 1; }
     
     input, select, textarea { 
-      width: 100%; padding: 12px; margin-bottom: 15px; border: 1px solid #ddd; border-radius: 8px; box-sizing: border-box; font-size: 1rem;
+      width: 100%; 
+      padding: 14px; 
+      margin-bottom: 18px; 
+      border: 1px solid #ddd; 
+      border-radius: 10px; 
+      box-sizing: border-box; 
+      font-size: 1rem;
+      background-color: #fafafa;
+    }
+    input:focus, select:focus, textarea:focus {
+      outline: none;
+      border-color: var(--primary);
+      background-color: #fff;
     }
     
     .btn-submit { 
-      width: 100%; padding: 16px; background: #06C755; color: white; border: none; border-radius: 30px; font-size: 1.1rem; font-weight: bold; cursor: pointer;
+      width: 100%; 
+      padding: 18px; 
+      background: var(--line-color); 
+      color: white; 
+      border: none; 
+      border-radius: 50px; 
+      font-size: 1.1rem; 
+      font-weight: bold; 
+      cursor: pointer;
+      box-shadow: 0 5px 15px rgba(6, 199, 85, 0.3);
+      transition: all 0.2s;
     }
-    .btn-submit:active { opacity: 0.8; }
+    .btn-submit:active { transform: scale(0.97); opacity: 0.9; }
+
+    .note { font-size: 0.75rem; color: #888; text-align: center; margin-top: 10px; }
   </style>
 </head>
 <body>
@@ -33,8 +81,8 @@
 
 <div class="card">
   <div class="section-title">安否確認の設定</div>
-  <label>送付希望時間<span class="must">*</span></label>
-  <input type="time" id="send_time" required value="08:00">
+  <label>送付希望時間（1時間刻み）<span class="must">*</span></label>
+  <select id="send_time" required></select>
 
   <div class="section-title">ご本人様情報</div>
   <label>お名前（漢字）<span class="must">*</span></label>
@@ -45,8 +93,8 @@
   
   <label>フリガナ（カタカナ）<span class="must">*</span></label>
   <div class="flex">
-    <input type="text" id="user_last_kana" placeholder="ミョウジ" required pattern="[ァ-ヴー]*">
-    <input type="text" id="user_first_kana" placeholder="ナマエ" required pattern="[ァ-ヴー]*">
+    <input type="text" id="user_last_kana" placeholder="ミョウジ" required pattern="^[ァ-ヶー]+$">
+    <input type="text" id="user_first_kana" placeholder="ナマエ" required pattern="^[ァ-ヶー]+$">
   </div>
 
   <label>ご住所<span class="must">*</span></label>
@@ -63,8 +111,8 @@
   <select id="emergency_rel" required>
     <option value="">選択してください</option>
     <option value="夫・妻">夫・妻</option>
-    <option value="長男・次男以降">息子（長男・次男以降）</option>
-    <option value="長女・次女以降">娘（長女・次女以降）</option>
+    <option value="息子">息子</option>
+    <option value="娘">娘</option>
     <option value="父・母">父・母</option>
     <option value="兄弟・姉妹">兄弟・姉妹</option>
     <option value="親戚">親戚</option>
@@ -76,7 +124,7 @@
   <input type="text" id="emergency_name" placeholder="山田 一郎" required>
   
   <label>LINE ID<span class="must">*</span></label>
-  <input type="text" id="emergency_line" placeholder="必須項目です" required>
+  <input type="text" id="emergency_line" placeholder="連絡先のLINE ID" required>
   
   <label>電話番号<span class="must">*</span></label>
   <input type="tel" id="emergency_tel" placeholder="08012345678" required>
@@ -85,26 +133,53 @@
   <input type="email" id="emergency_email" placeholder="family@mail.com" required>
 
   <label>ご住所（任意）</label>
-  <textarea id="emergency_address" rows="2" placeholder="任意項目です"></textarea>
+  <textarea id="emergency_address" rows="2" placeholder="ご本人様と異なる場合など"></textarea>
 </div>
 
 <button class="btn-submit" onclick="submitForm()">保存して決済へ進む</button>
+<p class="note">※決済完了後にサービスが開始されます</p>
 
 <script>
-// --- 設定項目 ---
-const LIFF_ID = "2008865871-FxyZCAxY";
-const MAKE_WEBHOOK_URL = "https://hook.eu1.make.com/9srxouf4fnybpzqf4f5epbcb3mzbgien";
-const STRIPE_URL = "https://buy.stripe.com/test_3cIbJ15yndQnbHd5An1Nu05";
+// --- ★ 各自の設定に合わせて書き換えてください ★ ---
+const LIFF_ID = "あなたのLIFF_ID"; 
+const MAKE_WEBHOOK_URL = "あなたのMake用WebhookURL"; 
+const STRIPE_URL = "あなたのStripeリンク"; 
 
-async function initLIFF() {
-  await liff.init({ liffId: LIFF_ID });
-  if (!liff.isLoggedIn()) { liff.login(); }
+// 1. 時間の選択肢を自動生成する（1時間刻み）
+function generateTimeOptions() {
+  const select = document.getElementById('send_time');
+  const interval = 60; // 60分(1時間)刻み
+
+  for (let minutes = 0; minutes < 24 * 60; minutes += interval) {
+    const h = Math.floor(minutes / 60);
+    const m = minutes % 60;
+    const timeString = h.toString().padStart(2, '0') + ":" + m.toString().padStart(2, '0');
+
+    const option = document.createElement('option');
+    option.value = timeString;
+    option.textContent = timeString;
+    if (timeString === "08:00") option.selected = true; // 初期値
+    select.appendChild(option);
+  }
 }
 
+// 2. LIFFの初期化
+async function initLIFF() {
+  try {
+    await liff.init({ liffId: LIFF_ID });
+    generateTimeOptions();
+    if (!liff.isLoggedIn()) {
+      liff.login();
+    }
+  } catch (err) {
+    console.error("LIFF初期化エラー:", err);
+  }
+}
+
+// 3. データの送信と遷移
 async function submitForm() {
   const profile = await liff.getProfile();
   
-  // データ取得
   const formData = {
     userId: profile.userId,
     sendTime: document.getElementById('send_time').value,
@@ -123,25 +198,25 @@ async function submitForm() {
     emergencyAddress: document.getElementById('emergency_address').value,
   };
 
-  // 必須チェック
-  if(!formData.userLastName || !formData.emergencyLine || !formData.emergencyEmail) {
-    alert("必須項目(*)をすべて入力してください");
+  // 簡易バリデーション
+  if(!formData.userLastName || !formData.emergencyLine) {
+    alert("未入力の必須項目があります");
     return;
   }
 
   try {
-    // 1. Make.comにデータを送信
+    // Make.comへ送信
     await fetch(MAKE_WEBHOOK_URL, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify(formData)
     });
 
-    // 2. Stripe決済へ
+    // Stripeへ遷移
     window.location.href = `${STRIPE_URL}?client_reference_id=${profile.userId}`;
     
   } catch (e) {
-    alert("エラーが発生しました。");
+    alert("通信エラーが発生しました。");
   }
 }
 
